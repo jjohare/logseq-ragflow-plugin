@@ -21,28 +21,7 @@ Before using the plugin, you need to configure it according to your preferences.
 
 - **API Key**: Enter your RAGflow API key.
 
-## How to Use a Custom Prompt
 
-- Open the plugin settings and locate "customPrompts" field.
-
-- Add the following JSON object to the "prompts" array:
-
-```json
-{
-  "apiKey": "<your-api-key>",
-  "model": "gpt-3.5-turbo",
-  "customPrompts": {
-    "enable": true, // <- Make sure to enable this.
-    "prompts": [
-      {
-        "name": "Markdown Table",
-        "prompt": "Please generate a {{text}} Markdown table",
-        "output": "replace" // "property", "replace" or "insert"
-      }
-    ]
-  },
-  "disabled": false
-}
 ```
 
 - In the Logseq editor, focus the cursor on the place where you want to generate the table and do the following.
