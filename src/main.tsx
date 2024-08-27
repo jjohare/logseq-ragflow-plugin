@@ -2,14 +2,13 @@ import '@logseq/libs';
 import { SettingSchemaDesc, BlockEntity } from '@logseq/libs/dist/LSPlugin.user';
 import { getBlockContent, formatResponse, convertLogseqLinksToMarkdown } from './utils';
 
-// Define the structure for our plugin settings
+// Define the structure for plugin settings
 interface ISettings {
   apiKey: string;
   basePath: string;
 }
 
-// Store the conversation ID globally to maintain context across API calls
-let conversationId: string | null = null;
+// No need to maintain a global conversation ID since a new conversation is started for each command
 
 /**
  * Creates a new conversation with the RAGflow service.
@@ -31,12 +30,12 @@ async function createConversation(basePath: string, apiKey: string): Promise<str
 }
 
 /**
- * Sends a message to RAGflow and gets the response.
+ * Sends a message to RAGflow and retrieves the answer.
  * @param basePath - The base URL of the RAGflow API
  * @param apiKey - The API key for authentication
  * @param conversationId - The ID of the current conversation
- * @param message - The message to send
- * @returns Promise<string> - The response from RAGflow
+ * @param message - The message to send (in Markdown format)
+ * @returns Promise<string> - The answer from RAGflow
  */
 async function getAnswer(basePath: string, apiKey: string, conversationId: string, message: string): Promise<string> {
   const response = await fetch(`${basePath}/api/completion`, {
@@ -90,16 +89,15 @@ async function handleRagflowCommand(uuid: string, apiKey: string, basePath: stri
     // Convert Logseq-style links to Markdown for better processing by RAGflow
     const markdownContent = convertLogseqLinksToMarkdown(rawContent);
 
-    // Create a new conversation if one doesn't exist
-    if (!conversationId) {
-      conversationId = await createConversation(basePath, apiKey);
-    }
+    // Create a new conversation
+    const conversationId = await createConversation(basePath, apiKey);
 
     // Send the content to RAGflow and get the response
     const response = await getAnswer(basePath, apiKey, conversationId, markdownContent);
+
     // Format the response for insertion into Logseq
     const formattedResponse = formatResponse(response);
-    
+
     // Update the original block with the response
     await logseq.Editor.updateBlock(uuid, formattedResponse);
   } catch (error) {
@@ -124,7 +122,7 @@ function isValidSettings(settings: unknown): settings is ISettings {
  */
 async function main() {
   const settings = logseq.settings as unknown;
-  
+
   // Validate settings before proceeding
   if (!isValidSettings(settings)) {
     await logseq.UI.showMsg("Invalid plugin settings. Please check API Key and Base Path.", "error");
@@ -140,10 +138,10 @@ async function main() {
 
   // Reset the conversation if settings change
   logseq.onSettingsChanged(() => {
-    conversationId = null;
     main(); // Reinitialize the plugin with new settings
   });
 }
 
 // Initialize the plugin
 logseq.useSettingsSchema(settings).ready(main).catch(console.error);
+

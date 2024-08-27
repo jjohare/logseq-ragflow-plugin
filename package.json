@@ -1,5 +1,5 @@
 {
-  "name": "logseq-plugin-ai-assistant",
+  "name": "logseq-ragflow-ai-assistant",
   "version": "1.4.0",
   "main": "dist/index.html",
   "scripts": {
@@ -39,8 +39,8 @@
     "vite-plugin-logseq": "1.1.2"
   },
   "logseq": {
-    "id": "logseq-plugin-ai-assistant",
-    "title": "AI Assistant",
+    "id": "logseq-ragflow-ai-assistant",
+    "title": "RAGflow AI",
     "icon": "./logo.svg"
   }
 }
